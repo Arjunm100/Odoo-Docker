@@ -1,0 +1,60 @@
+version: '3.1'
+services:
+  odoo_main:
+    build: 
+      context: ./
+      dockerfile: Dockerfile_main
+    depends_on:
+      - db_main
+    env_file: envfile.env
+    ports:
+      - 8069:8069
+    volumes:
+      - odoo-main-data:/var/lib/odoo
+      - ./config/odoo_main.conf:/etc/odoo/odoo.conf
+    networks:
+      - main_network
+  odoo_staging:
+    build: 
+      context: ./
+      dockerfile: Dockerfile_staging
+    depends_on:
+      - db_staging
+    env_file: envfile.env
+    ports:
+      - 8070:8069
+    volumes:
+      - odoo-staging-data:/var/lib/odoo
+    networks:
+      - staging_network
+  db_main:
+    image: postgres:15
+    env_file: envfile.env
+    volumes:
+      - db_main:/var/lib/pgsql/data/pgdata
+    networks:
+      - main_network
+
+  db_staging:
+    image: postgres:15
+    env_file: envfile_staging.env
+    volumes:
+      - db_staging:/var/lib/pgsql/data/pgdata
+    networks:
+      - staging_network
+volumes:
+  db_main:
+  db_staging:
+  odoo-main-data:
+  odoo-staging-data:
+
+networks:
+  main_network:
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.host_binding_ipv4: "127.0.0.1"
+  staging_network:
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.host_binding_ipv4: "127.0.0.1"
+  
