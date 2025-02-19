@@ -1,5 +1,12 @@
 version: '3.1'
 services:
+  db_main:
+    image: postgres:15
+    env_file: envfile.env
+    volumes:
+      - db_main:/var/lib/pgsql/data/pgdata
+    networks:
+      - main_network
   odoo_main:
     build: 
       context: ./
@@ -12,6 +19,8 @@ services:
     volumes:
       - odoo-main-data:/var/lib/odoo
       - ./config/odoo_main.conf:/etc/odoo/odoo.conf
+    #   - ./Backup_Cron:/mnt/backup
+    # command: ["sh", "-c", "/mnt/backup/crone.sh && odoo --config=/etc/odoo/odoo.conf"]
     networks:
       - main_network
   odoo_staging:
@@ -27,13 +36,6 @@ services:
       - odoo-staging-data:/var/lib/odoo
     networks:
       - staging_network
-  db_main:
-    image: postgres:15
-    env_file: envfile.env
-    volumes:
-      - db_main:/var/lib/pgsql/data/pgdata
-    networks:
-      - main_network
 
   db_staging:
     image: postgres:15
@@ -47,6 +49,7 @@ volumes:
   db_staging:
   odoo-main-data:
   odoo-staging-data:
+  
 
 networks:
   main_network:
