@@ -1,30 +1,32 @@
 #!/bin/bash
 
-# docker exec 68e25c4e0d8a pg_dump -U main DB1 > /home/cybrosys/Desktop/Docker/odoo-docker-setup/Backup_Cron/backup_data/odoo_db_backup_$(date +"%Y-%m-%d_%H-%M-%S").sql
-
-DB_CONTAINER_ID="68e25c4e0d8a"
+DB_CONTAINER_ID="odoo-docker-setup_db_main_1"
 
 CONTAINER_ID="odoo-docker-setup_odoo_main_1"
 
 HOST_PATH="/home/cybrosys/Desktop/Docker/odoo-docker-setup/Backup_Cron/backup_data"
 
-FILE_NAME="odoo_data_backup_$(date +"%Y-%m-%d_%H-%M-%S").tar.gz"
+LOG_PATH="/home/cybrosys/Desktop/Docker/odoo-docker-setup/Backup_Cron/logs"
 
-# Database Backup
-docker exec 68e25c4e0d8a pg_dump -U main DB1 > $HOST_PATH/odoo_db_backup_$(date +"%Y-%m-%d_%H-%M-%S").sql
-# sudo docker exec -t 312c8ec94f46 pg_dumpall -c -U odoo18 > dump_`date +%Y-%m-%d"_"%H_%M_%S`.sql
+find $HOST_PATH -type f -name '*.tar.gz' -mmin +5 -exec rm {} \;
 
-docker exec odoo-docker-setup_odoo_main_1 tar -cvzf tmp/$FILE_NAME -C /var/lib odoo
+find $HOST_PATH -type f -name '*.sql' -mmin +5 -exec rm {} \;
 
-docker cp $CONTAINER_ID:tmp/$FILE_NAME $HOST_PATH
+sudo find $LOG_PATH -type f -name '*.log' -mmin +10 -exec rm {} \;
 
-# # Optional: Remove old backups, keeping last 3
+RESULT=$(sudo docker ps --format "{{.Names}}")
 
-# find $HOST_PATH -type f -name '*.tar.gz' -mtime +3 -exec rm {} \\\\;
+string='My long string'
+if [[ $RESULT == *"$CONTAINER_ID"*  &&  $RESULT == *"$DB_CONTAINER_ID"* ]]; then
+    FILE_NAME="odoo_data_backup_$(date +"%Y-%m-%d_%H-%M-%S").tar.gz"
 
-# find $HOST_PATH -type f -name '*.sql' -mtime +3 -exec rm {} \\\\;
+    docker exec $DB_CONTAINER_ID pg_dump -U main DX > $HOST_PATH/odoo_db_backup_$(date +"%Y-%m-%d_%H-%M-%S").sql
 
-# echo "Backup completed successfully!"
+    docker exec odoo-docker-setup_odoo_main_1 tar -cvzf tmp/$FILE_NAME -C /var/lib odoo
 
+    docker cp $CONTAINER_ID:tmp/$FILE_NAME $HOST_PATH
 
-docker exec -it  pg_dump -U odoo -d DB1 > $HOST_PATH/odoo_db_backup_$(date +"%Y-%m-%d_%H-%M-%S").sql
+    docker exec $CONTAINER_ID sh -c 'rm /tmp/*.tar.gz'
+else
+    echo "Containers are not online"
+fi
