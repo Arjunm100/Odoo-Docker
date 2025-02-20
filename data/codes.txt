@@ -16,4 +16,10 @@ access db:
 
 1.sudo docker exec -it odoo-docker-setup_db_main_1 psql -U  odoo18 postgres
 
+restore volume:
+    docker run --rm -v "odoo-docker-setup_db_staging:/data" \
+    -v "/home/cybrosys/Desktop/Docker/odoo-docker-setup/Backup_Cron/backup_data:/backup" \
+    busybox sh -c 'tar xzf /backup/db_backup_2025-02-20_06-18-10.tar.gz -C /data'
+
+
 
