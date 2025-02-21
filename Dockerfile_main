@@ -1,7 +1,0 @@
-FROM odoo:latest
-
-RUN chmod -R 777 ./mnt/extra-addons
-
-COPY /custom_addons_main /mnt/extra-addons
-
-CMD ["odoo", "-c", "/etc/odoo/odoo.conf"]

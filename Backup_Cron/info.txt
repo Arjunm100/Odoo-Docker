@@ -1,0 +1,26 @@
+To set-up Cron
+--------------
+
+1. crontab -e 
+    In opened window(at the end):* * * * * <path/to/backup.sh>
+    (ctrl+x then y to save and enter to confirm)
+
+2.crontab -l
+    List all the cron for the user
+
+3.crontab -r
+    Remove all the cron for the user
+
+
+crontime setup
+--------------
+
+*     *     *     *     *
+|     |     |     |     |
+|     |     |     |     +---- Day of the week   (0 - 7) (Sunday = 0 or 7)
+|     |     |     +---------- Month             (1 - 12)
+|     |     +---------------- Day of the month  (1 - 31)
+|     +---------------------- Hour              (0 - 23)
++--------------------------- Minute            (0 - 59)
+
+

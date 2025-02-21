@@ -2,7 +2,7 @@ version: '3.1'
 services:
   db_main:
     image: postgres:15
-    env_file: envfile.env
+    env_file: Odoo_main/envfile.env
     volumes:
       - db_main:/var/lib/pgsql/data/pgdata
     networks:
@@ -10,26 +10,24 @@ services:
   odoo_main:
     build: 
       context: ./
-      dockerfile: Dockerfile_main
+      dockerfile: Odoo_main/Dockerfile_main
     depends_on:
       - db_main
-    env_file: envfile.env
+    env_file: Odoo_main/envfile.env
     ports:
       - 8069:8069
     volumes:
       - odoo-main-data:/var/lib/odoo
-      - ./config/odoo_main.conf:/etc/odoo/odoo.conf
-    #   - ./Backup_Cron:/mnt/backup
-    # command: ["sh", "-c", "/mnt/backup/crone.sh && odoo --config=/etc/odoo/odoo.conf"]
+      - ./Odoo_main/odoo_main.conf:/etc/odoo/odoo.conf
     networks:
       - main_network
   odoo_staging:
     build: 
       context: ./
-      dockerfile: Dockerfile_staging
+      dockerfile: Odoo_staging/Dockerfile_staging
     depends_on:
       - db_staging
-    env_file: envfile.env
+    env_file: Odoo_staging/envfile_staging.env
     ports:
       - 8070:8069
     volumes:
@@ -39,7 +37,7 @@ services:
 
   db_staging:
     image: postgres:15
-    env_file: envfile_staging.env
+    env_file: Odoo_staging/envfile_staging.env
     volumes:
       - db_staging:/var/lib/pgsql/data/pgdata
     networks:
